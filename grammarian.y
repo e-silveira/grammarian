@@ -11,21 +11,37 @@ import Lexer
 
 %token
       sym             { Symbol $$ }
-      '|'             { Union }
-      '='             { Attr }
-      '&'             { Empty }
+      '='             { Equal }
+      ','             { Comma }
+      ':'             { Colon }
       '('             { LParen }
       ')'             { RParen }
       '{'             { LBrace }
       '}'             { RBrace }
-      ','             { Comma }
-      ':'             { Colon }
 
 %%
 
-G : sym '=' '(' T ',' V ',' S ',' P ')' { Grammar $4 $6 $8 $10 }
+grammar : sym '=' '(' terms ',' vars ',' sym ',' prods ')' { Grammar $4 $6 (Variable $8) $10 }
+
+terms   : '{' terms_ '}'                                   { $2 }
+terms_  : sym                                              { [Terminal $1] }
+        | terms_ ',' sym                                   { Terminal $3 : $1 }
+
+vars    : '{' vars_ '}'                                    { $2 }
+vars_   : sym                                              { [Variable $1] }
+        | vars_ ',' sym                                    { Variable $3 : $1 }
+
+prods   : '{' prods_ '}'                                   { $2 }
+prods_  : prod                                             { [$1] }
+        | prods_ ',' prod                                  { $3 : $1 }
+
+prod    : sym ':' sym sym                                  { Production (Variable $1) [Terminal $3] (Variable $4) }
 
 {
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
+
+main = do
+  gr <- readFile "example.gr"
+  print $ grammarian $ lexer gr
 }

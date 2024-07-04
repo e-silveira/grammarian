@@ -1,8 +1,8 @@
 module Grammar where
 
-newtype Terminal = Terminal String deriving (Show)
+newtype Terminal = Terminal Char deriving (Show)
 
-newtype Variable = Variable String deriving (Show)
+newtype Variable = Variable Char deriving (Show)
 
 data Production
   = Production
