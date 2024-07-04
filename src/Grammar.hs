@@ -8,7 +8,7 @@ data Production
   = Production
   { from :: Variable,
     string :: [Terminal],
-    to :: Variable
+    to :: Maybe Variable
   }
   deriving (Show)
 

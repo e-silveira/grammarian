@@ -2,5 +2,6 @@ G = (
   { a, b },
   { S, A, B },
   S,
-  { S : aS }
+  { S : aaS,
+    A : a}
 )

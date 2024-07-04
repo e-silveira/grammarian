@@ -8,9 +8,11 @@ import Lexer
 %name parser 
 %tokentype { Token }
 %error { parseError }
+%monad { Either String } { (>>=) } { return }
 
 %token
-      sym             { Symbol $$ }
+      usym            { UpperSymbol $$ }
+      lsym            { LowerSymbol $$ }
       '='             { Equal }
       ','             { Comma }
       ':'             { Colon }
@@ -21,26 +23,32 @@ import Lexer
 
 %%
 
-grammar : sym '=' '(' terms ',' vars ',' sym ',' prods ')' { Grammar $4 $6 (Variable $8) $10 }
+grammar : usym '=' '(' terms ',' vars ',' usym ',' prods ')' { Grammar $4 $6 (Variable $8) $10 }
 
-terms   : '{' terms_ '}'                                   { $2 }
-terms_  : sym                                              { [Terminal $1] }
-        | terms_ ',' sym                                   { Terminal $3 : $1 }
+terms   : '{' terms_ '}'                                  { $2 }
+terms_  : lsym                                            { [Terminal $1] }
+        | terms_ ',' lsym                                 { Terminal $3 : $1 }
 
-vars    : '{' vars_ '}'                                    { $2 }
-vars_   : sym                                              { [Variable $1] }
-        | vars_ ',' sym                                    { Variable $3 : $1 }
+vars    : '{' vars_ '}'                                   { $2 }
+vars_   : usym                                            { [Variable $1] }
+        | vars_ ',' usym                                  { Variable $3 : $1 }
 
-prods   : '{' prods_ '}'                                   { $2 }
-prods_  : prod                                             { [$1] }
-        | prods_ ',' prod                                  { $3 : $1 }
+prods   : '{' prods_ '}'                                  { $2 }
+prods_  : prod                                            { [$1] }
+        | prods_ ',' prod                                 { $3 : $1 }
 
-prod    : sym ':' sym sym                                  { Production (Variable $1) [Terminal $3] (Variable $4) }
+prod    : usym ':' lsyms maybeusym                        { Production (Variable $1) $3 $4 }
 
+lsyms  : lsym                                             { [Terminal $1] }
+        | lsyms lsym                                      { Terminal $2 : $1 }
+
+maybeusym : {- empty -}                                   { Nothing }
+          | usym                                          { Just $ Variable $1 }
+          
 {
-parseError :: [Token] -> a
-parseError _ = error "Parse error"
+parseError :: [Token] -> Either String a
+parseError = Left . show 
 
-parse :: String -> Grammar
+parse :: String -> Either String Grammar
 parse s = parser $ lexer s
 }

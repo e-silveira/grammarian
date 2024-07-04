@@ -1,6 +1,6 @@
 module Lexer where
 
-import Data.Char (isAlpha, isSpace)
+import Data.Char (isAlpha, isSpace, isLower, isUpper)
 
 data Token
   = Union
@@ -12,7 +12,8 @@ data Token
   | RParen
   | LBrace
   | RBrace
-  | Symbol Char
+  | LowerSymbol Char
+  | UpperSymbol Char
   deriving (Show)
 
 lexer :: String -> [Token]
@@ -28,5 +29,6 @@ lexer ('{' : cs) = LBrace : lexer cs
 lexer ('}' : cs) = RBrace : lexer cs
 lexer (c : cs)
   | isSpace c = lexer cs
-  | isAlpha c = Symbol c : lexer cs
+  | isAlpha c && isLower c = LowerSymbol c : lexer cs
+  | isAlpha c && isUpper c = UpperSymbol c : lexer cs
 lexer _ = error "Unhandled character."
