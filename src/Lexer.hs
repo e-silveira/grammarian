@@ -31,3 +31,4 @@ lexer ('}' : cs) = RBrace : lexer cs
 lexer (c : cs)
   | isSpace c = lexer cs
   | isAlpha c = Symbol c : lexer cs
+lexer _ = error "Unhandled character."
