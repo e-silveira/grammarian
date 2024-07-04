@@ -1,0 +1,9 @@
+G = ( 
+  T = { a, b },
+  V = { S, A, B },
+  S = S,
+  P = { S : aS | bS | A | B
+      , A : aA | &
+      , B : bB | &
+      }
+)
