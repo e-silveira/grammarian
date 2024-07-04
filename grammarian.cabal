@@ -16,8 +16,6 @@ library parser
 
     exposed-modules:
         Parser
-
-    other-modules:
         Grammar
         Lexer
 
@@ -31,20 +29,6 @@ library parser
 
     default-language: Haskell2010
 
-library grammar
-    import: warnings
-
-    exposed-modules:
-        Grammar
-        Lexer
-
-    build-depends:
-        base ^>=4.17.2.1,
-
-    hs-source-dirs: src
-
-    default-language: Haskell2010
-
 executable grammarian
     import:           warnings
 
@@ -52,8 +36,7 @@ executable grammarian
 
     build-depends:
         base ^>=4.17.2.1,
-        grammar,
-        parser
+        grammarian:parser
 
     hs-source-dirs:   app
 
