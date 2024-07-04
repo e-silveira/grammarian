@@ -1,11 +1,11 @@
 {
-module Main where
+module Parser where
 
 import Grammar
 import Lexer
 }
 
-%name grammarian 
+%name parser 
 %tokentype { Token }
 %error { parseError }
 
@@ -41,7 +41,6 @@ prod    : sym ':' sym sym                                  { Production (Variabl
 parseError :: [Token] -> a
 parseError _ = error "Parse error"
 
-main = do
-  gr <- readFile "example.gr"
-  print $ grammarian $ lexer gr
+parse :: String -> Grammar
+parse s = parser $ lexer s
 }

@@ -15,8 +15,6 @@ data Token
   | Symbol Char
   deriving (Show)
 
--- Como tratar erros?
-
 lexer :: String -> [Token]
 lexer [] = []
 lexer ('|' : cs) = Union : lexer cs
