@@ -20,10 +20,12 @@ library parser
     other-modules:
         Grammar
         Lexer
+        PMonad
 
     build-depends:
         base ^>=4.17.2.1,
-        array
+        array,
+        mtl
 
     build-tool-depends: happy:happy
 

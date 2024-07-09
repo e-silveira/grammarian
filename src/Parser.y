@@ -3,12 +3,13 @@ module Parser where
 
 import Grammar
 import Lexer
+import PMonad
 }
 
 %name parser 
 %tokentype { Token }
 %error { parseError }
-%monad { Either String } { (>>=) } { return }
+%monad { PMonad String } { (>>=) } { return }
 
 %token
       usym            { UpperSymbol $$ }
@@ -29,7 +30,9 @@ grammar :: {Grammar}
 terms   :: {[Terminal]} 
         : '{' terms_ '}'                                  { $2 }
 terms_  :: {[Terminal]}
-        : lsym                                            { [Terminal $1] }
+        : lsym                 {% do 
+                                putContext "cum" 
+                                return [Terminal $1] }
         | terms_ ',' lsym                                 { Terminal $3 : $1 }
 
 vars    :: {[Variable]}
@@ -56,9 +59,9 @@ maybeusym :: {Maybe Variable}
           | usym                                          { Just $ Variable $1 }
           
 {
-parseError :: [Token] -> Either String a
-parseError = Left . show 
+parseError :: [Token] -> PMonad String a
+parseError = throwError . show 
 
-parse :: String -> Either String Grammar
-parse s = parser $ lexer s
+parse :: String -> Either String (Grammar, String)
+parse s = runPMonad (parser $ lexer s) mempty
 }
