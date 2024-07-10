@@ -1,6 +1,6 @@
 G = ( 
   { a, b },
-  { S, A, B },
+  { S, A, B, A },
   S,
   { S : aaS,
     A : a}

@@ -31,22 +31,20 @@ terms   :: {[Terminal]}
         : '{' terms_ '}'                                  { $2 }
 terms_  :: {[Terminal]}
         : lsym                  {% do
-                                    assertContext (not . elem (Left $ Terminal $1)) "Duplicate terminal on definition"
-                                    modContext (++ [Left $ Terminal $1])
+                                    addTerminal $ Terminal $1
                                     return [Terminal $1] }
         | terms_ ',' lsym       {% do
-                                    assertContext (not . elem (Left $ Terminal $3)) "Duplicate terminal on definition"
-                                    modContext (++ [Left $ Terminal $3])
+                                    addTerminal $ Terminal $3
                                     return $ Terminal $3 : $1 }
 
 vars    :: {[Variable]}
         : '{' vars_ '}'                                   { $2 }
 vars_   :: {[Variable]}
         : usym                  {% do
-                                    modContext (++ [Right $ Variable $1])
+                                    addVariable $ Variable $1
                                     return [Variable $1] }
         | vars_ ',' usym        {% do 
-                                    modContext (++ [Right $ Variable $3])
+                                    addVariable $ Variable $3
                                     return $ Variable $3 : $1 }
 
 prods   :: {[Production]}
@@ -67,7 +65,25 @@ maybeusym :: {Maybe Variable}
           | usym                                          { Just $ Variable $1 }
           
 {
-type Context = [Either Terminal Variable]
+data Context = Context [Terminal] [Variable] deriving (Eq, Show)
+
+instance Semigroup Context where
+    Context t1 v1 <> Context t2 v2 = Context (t1 ++ t2) (v1 ++ v2)
+
+instance Monoid Context where
+    mempty = Context [] []
+
+addTerminal :: Terminal -> PMonad Context ()
+addTerminal t = do
+    Context ts vs <- viewContext
+    assertContext (const $ not $ elem t ts) ("Duplicate terminal on definition: " ++ show t)
+    modContext $ \(Context ts vs) -> Context (t:ts) vs
+
+addVariable :: Variable -> PMonad Context ()
+addVariable v = do
+    Context ts vs <- viewContext
+    assertContext (const $ not $ elem v vs) ("Duplicate nonterminal on definition: " ++ show v)
+    modContext $ \(Context ts vs) -> Context ts (v:vs)
 
 parseError :: [Token] -> PMonad Context a
 parseError = throwError . show 
