@@ -9,7 +9,7 @@ import PMonad
 %name parser 
 %tokentype { Token }
 %error { parseError }
-%monad { PMonad String } { (>>=) } { return }
+%monad { PMonad Context } { (>>=) } { return }
 
 %token
       usym            { UpperSymbol $$ }
@@ -30,16 +30,24 @@ grammar :: {Grammar}
 terms   :: {[Terminal]} 
         : '{' terms_ '}'                                  { $2 }
 terms_  :: {[Terminal]}
-        : lsym                 {% do 
-                                putContext "cum" 
-                                return [Terminal $1] }
-        | terms_ ',' lsym                                 { Terminal $3 : $1 }
+        : lsym                  {% do
+                                    assertContext (not . elem (Left $ Terminal $1)) "Duplicate terminal on definition"
+                                    modContext (++ [Left $ Terminal $1])
+                                    return [Terminal $1] }
+        | terms_ ',' lsym       {% do
+                                    assertContext (not . elem (Left $ Terminal $3)) "Duplicate terminal on definition"
+                                    modContext (++ [Left $ Terminal $3])
+                                    return $ Terminal $3 : $1 }
 
 vars    :: {[Variable]}
         : '{' vars_ '}'                                   { $2 }
 vars_   :: {[Variable]}
-        : usym                                            { [Variable $1] }
-        | vars_ ',' usym                                  { Variable $3 : $1 }
+        : usym                  {% do
+                                    modContext (++ [Right $ Variable $1])
+                                    return [Variable $1] }
+        | vars_ ',' usym        {% do 
+                                    modContext (++ [Right $ Variable $3])
+                                    return $ Variable $3 : $1 }
 
 prods   :: {[Production]}
         : '{' prods_ '}'                                  { $2 }
@@ -59,9 +67,11 @@ maybeusym :: {Maybe Variable}
           | usym                                          { Just $ Variable $1 }
           
 {
-parseError :: [Token] -> PMonad String a
+type Context = [Either Terminal Variable]
+
+parseError :: [Token] -> PMonad Context a
 parseError = throwError . show 
 
-parse :: String -> Either String (Grammar, String)
+parse :: String -> Either String (Grammar, Context)
 parse s = runPMonad (parser $ lexer s) mempty
 }
