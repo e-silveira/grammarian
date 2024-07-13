@@ -3,13 +3,13 @@ module Parser where
 
 import Grammar
 import Lexer
-import PMonad
+import Control.Monad.Identity
 }
 
 %name parser 
 %tokentype { Token }
 %error { parseError }
-%monad { PMonad Context } { (>>=) } { return }
+%monad { Identity } { (>>=) } { return }
 
 %token
       usym            { UpperSymbol $$ }
@@ -30,22 +30,14 @@ grammar :: {Grammar}
 terms   :: {[Terminal]} 
         : '{' terms_ '}'                                  { $2 }
 terms_  :: {[Terminal]}
-        : lsym                  {% do
-                                    addTerminal $ Terminal $1
-                                    return [Terminal $1] }
-        | terms_ ',' lsym       {% do
-                                    addTerminal $ Terminal $3
-                                    return $ Terminal $3 : $1 }
+        : lsym                  { [Terminal $1] }
+        | terms_ ',' lsym       { Terminal $3 : $1 }
 
 vars    :: {[Variable]}
         : '{' vars_ '}'                                   { $2 }
 vars_   :: {[Variable]}
-        : usym                  {% do
-                                    addVariable $ Variable $1
-                                    return [Variable $1] }
-        | vars_ ',' usym        {% do 
-                                    addVariable $ Variable $3
-                                    return $ Variable $3 : $1 }
+        : usym                  { [Variable $1] }
+        | vars_ ',' usym        { Variable $3 : $1 }
 
 prods   :: {[Production]}
         : '{' prods_ '}'                                  { $2 }
@@ -65,29 +57,9 @@ maybeusym :: {Maybe Variable}
           | usym                                          { Just $ Variable $1 }
           
 {
-data Context = Context [Terminal] [Variable] deriving (Eq, Show)
+parseError :: [Token] -> Identity a
+parseError tk = error $ "grammar parsing error" ++ show tk
 
-instance Semigroup Context where
-    Context t1 v1 <> Context t2 v2 = Context (t1 ++ t2) (v1 ++ v2)
-
-instance Monoid Context where
-    mempty = Context [] []
-
-addTerminal :: Terminal -> PMonad Context ()
-addTerminal t = do
-    Context ts vs <- viewContext
-    assertContext (const $ not $ elem t ts) ("Duplicate terminal on definition: " ++ show t)
-    modContext $ \(Context ts vs) -> Context (t:ts) vs
-
-addVariable :: Variable -> PMonad Context ()
-addVariable v = do
-    Context ts vs <- viewContext
-    assertContext (const $ not $ elem v vs) ("Duplicate nonterminal on definition: " ++ show v)
-    modContext $ \(Context ts vs) -> Context ts (v:vs)
-
-parseError :: [Token] -> PMonad Context a
-parseError = throwError . show 
-
-parse :: String -> Either String (Grammar, Context)
-parse s = runPMonad (parser $ lexer s) mempty
+parse :: String -> Grammar
+parse s = runIdentity (parser $ lexer s)
 }

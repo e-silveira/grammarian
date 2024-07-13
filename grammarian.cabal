@@ -18,7 +18,6 @@ library parser
         Parser
         Grammar
         Lexer
-        PMonad
 
     build-depends:
         base ^>=4.17.2.1,
