@@ -1,7 +1,11 @@
-G = ( 
-  { a, b, a },
-  { S, A, B, A },
-  S,
-  { S : aaS,
-    A : a}
+( { a, b }
+, { A, B }
+, A 
+, { A : aA
+  , A : aB
+  , B : bB
+  , B : bC
+  , C : cC
+  , C : c
+  }
 )
