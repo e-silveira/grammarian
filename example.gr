@@ -3,8 +3,10 @@
 , A 
 , { A : aA
   , A : aB
+  , A : B
   , B : bB
   , B : bC
+  , B : C
   , C : cC
   , C : c
   }

@@ -51,7 +51,7 @@ prod    :: {Production}
         : usym ':' lsyms maybeusym                        { Production (Variable $1) $3 $4 }
 
 lsyms   :: {[Terminal]}
-        : lsym                                             { [Terminal $1] }
+        : {- empty -}                                   { [] }
         | lsyms lsym                                      { Terminal $2 : $1 }
 
 maybeusym :: {Maybe Variable}
