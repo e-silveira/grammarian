@@ -2,23 +2,23 @@ module Main where
 
 import Grammar
 import Parser
+import System.IO
+import System.Environment (getArgs)
 
-t :: [String]
-t =
-  [ "ab",
-    "aab",
-    "aabb",
-    "aacbb",
-    "c",
-    "a",
-    "",
-    "abc",
-    "aabbcc",
-    "aabc"
-  ]
+read' :: IO String
+read' = do
+  putStr "> "
+  hFlush stdout
+  getLine
 
 main :: IO ()
 main = do
-  gr <- readFile "example.gr"
-  let g = parse gr
-  print $ zip t (map (recognize g (start g)) t)
+  filename <- getArgs
+  gr <- readFile $ head filename
+  main' (parse gr)
+
+main' :: Grammar -> IO ()
+main' g = do
+  input <- read'
+  print $ recognize g (start g) input
+  main' g
