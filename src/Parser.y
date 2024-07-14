@@ -20,6 +20,7 @@ import Control.Monad.Identity
       ')'             { RParen }
       '{'             { LBrace }
       '}'             { RBrace }
+      epsilon             { Empty }
 
 %%
 
@@ -51,7 +52,8 @@ prod    :: {Production}
         : usym ':' lsyms maybeusym                        { Production (Variable $1) $3 $4 }
 
 lsyms   :: {[Terminal]}
-        : {- empty -}                                   { [] }
+        : {- empty -}                                     { [] }
+        | epsilon                                         { [] }
         | lsyms lsym                                      { Terminal $2 : $1 }
 
 maybeusym :: {Maybe Variable}
