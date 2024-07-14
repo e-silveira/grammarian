@@ -3,9 +3,7 @@ module Lexer where
 import Data.Char (isAlpha, isSpace, isLower, isUpper)
 
 data Token
-  = Union
-  | Equal
-  | Empty
+  = Empty
   | Comma
   | Colon
   | LParen
@@ -18,8 +16,6 @@ data Token
 
 lexer :: String -> [Token]
 lexer [] = []
-lexer ('|' : cs) = Union : lexer cs
-lexer ('=' : cs) = Equal : lexer cs
 lexer ('&' : cs) = Empty : lexer cs
 lexer (',' : cs) = Comma : lexer cs
 lexer (':' : cs) = Colon : lexer cs
