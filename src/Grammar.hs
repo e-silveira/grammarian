@@ -1,7 +1,5 @@
 module Grammar where
 
-import Data.Maybe (mapMaybe)
-
 newtype Terminal = Terminal Char deriving (Eq)
 
 instance Show Terminal where
@@ -17,7 +15,7 @@ data Production
   { from :: Variable,
     string :: [Terminal],
     to :: Maybe Variable
-  }
+  } deriving (Eq)
 
 instance Show Production where
   show p =

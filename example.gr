@@ -4,6 +4,7 @@
 , { A : aA
   , A : B
   , B : bB
+  , B : B
   , B : C
   , C : cC
   , C : &
