@@ -23,5 +23,5 @@ main = do
 main' :: Grammar -> IO ()
 main' g = do
   input <- read'
-  print $ run g input
+  run g input
   main' g
