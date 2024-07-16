@@ -1,5 +1,7 @@
-import Data.Maybe (mapMaybe)
+module Runner (run) where
 
+import Grammar
+import Data.Maybe (mapMaybe)
 
 recognizeTerminals :: [Terminal] -> String -> (Bool, String)
 recognizeTerminals [] s = (True, s)
@@ -27,3 +29,6 @@ recognize g v s
   where
     pp = filter (\p -> from p == v) (productions g)
     rp = mapMaybe (`recognizeProduction` s) pp
+
+run :: Grammar -> String -> Bool
+run g s = recognize g (start g) s

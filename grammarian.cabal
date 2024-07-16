@@ -18,6 +18,7 @@ library parser
         Parser
         Grammar
         Lexer
+        Runner
 
     build-depends:
         base ^>=4.17.2.1,

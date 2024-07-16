@@ -1,6 +1,7 @@
 module Main where
 
 import Grammar
+import Runner
 import Parser
 import System.IO
 import System.Environment (getArgs)
@@ -22,5 +23,5 @@ main = do
 main' :: Grammar -> IO ()
 main' g = do
   input <- read'
-  print $ recognize g (start g) input
+  print $ run g input
   main' g

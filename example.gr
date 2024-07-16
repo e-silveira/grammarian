@@ -1,7 +1,7 @@
 ( { a, b, c }
 , { A, B }
 , A 
-, { A : abA
+, { A : aA
   , A : B
   , B : bB
   , B : C
