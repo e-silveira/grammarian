@@ -1,13 +1,10 @@
-( { a, b }
+( { a, b, c }
 , { A, B }
 , A 
 , { A : aA
-  , A : aB
-  , A : B
-  , B : bB
-  , B : bC
-  , B : C
-  , C : cC
-  , C : &
+  , A : abB
+  , A : abC
+  , B : b
+  , C : c
   }
 )
