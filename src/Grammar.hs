@@ -2,9 +2,15 @@ module Grammar where
 
 import Data.Maybe (mapMaybe)
 
-newtype Terminal = Terminal Char deriving (Eq, Show)
+newtype Terminal = Terminal Char deriving (Eq)
 
-newtype Variable = Variable Char deriving (Eq, Show)
+instance Show Terminal where
+  show (Terminal c) = [c]
+
+newtype Variable = Variable Char deriving (Eq)
+
+instance Show Variable where
+  show (Variable c) = [c]
 
 data Production
   = Production
@@ -12,7 +18,13 @@ data Production
     string :: [Terminal],
     to :: Maybe Variable
   }
-  deriving (Show)
+
+instance Show Production where
+  show p =
+    show (from p) ++
+    " -> " ++
+    show (string p) ++
+    " " ++ maybe "" show (to p)
 
 data Grammar
   = Grammar
@@ -21,7 +33,15 @@ data Grammar
     start :: Variable,
     productions :: [Production]
   }
-  deriving (Show)
+
+instance Show Grammar where
+  show g = ("\nGrammar:\n\n" ++) . unlines $
+    ($ g) <$>
+    [ ("Terminals: "++)    . show.terminals,
+      ("Variables: "++)    . show.variables,
+      ("Start: "++)        . show.start,
+      ("Productions:\n"++) . unlines.map show.productions
+    ]
 
 recognizeTerminals :: [Terminal] -> String -> (Bool, String)
 recognizeTerminals [] s = (True, s)

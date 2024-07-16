@@ -15,7 +15,9 @@ main :: IO ()
 main = do
   filename <- getArgs
   gr <- readFile $ head filename
-  main' (parse gr)
+  let g = parse gr
+  print g
+  main' g
 
 main' :: Grammar -> IO ()
 main' g = do
