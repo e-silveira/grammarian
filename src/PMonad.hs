@@ -4,28 +4,6 @@ import Control.Monad.State
 
 type PMonad context a = StateT context (Either String) a
 
-{--
-Caro Eduardo,
-
-Isso é um monad transformer. Ele é uma monada que "transforma" outro monada.
-No caso, ele transforma a monada Either String em uma monada que também tem um estado.
-Isso é equivalente a ter um:
-
-data PMonad context a = PMonad (context -> (Either String a, context))
-
-mas como eu já tenho as duas definições
-
-data State context a = State (context -> (a, context))
-data Either a b = Left a | Right b
-
-, eu posso usar o StateT que deixa eu compor os dois.
-
-data StateT s m a = StateT { runStateT :: s -> m (a,s) }
-
-inclusive, o proprio State é um StateT com o Identity como monada base.
-
-data State s a = StateT s Identity a
---}
 
 
 viewContext :: PMonad context context
