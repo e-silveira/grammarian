@@ -10,16 +10,14 @@ data EvalTree a = LeafErr a | LeafOk a | Tree a [EvalTree a] deriving (Eq)
 instance Show a => Show (EvalTree a) where
   show = showTree ""
 
-showTree :: Show a => String -> EvalTree a -> String
-showTree prefix (LeafErr x) = prefix ++ "└── LeafErr: " ++ show x
-showTree prefix (LeafOk x)  = prefix ++ "└── LeafOk: " ++ show x
-showTree prefix (Tree x ts) =
-  prefix ++ "└── Tree: " ++ show x ++ "\n" ++ showSubTrees (prefix ++ "    ") ts
 
-showSubTrees :: Show a => String -> [EvalTree a] -> String
-showSubTrees _ [] = ""
-showSubTrees prefix [t] = showTree prefix t
-showSubTrees prefix (t:ts) = showTree (prefix ++ "├── ") t ++ "\n" ++ showSubTrees (prefix ++ "│   ") ts
+showTree :: Show a => String -> EvalTree a -> String
+showTree indent (LeafErr x) = indent ++ "LeafErr " ++ show x
+showTree indent (LeafOk x)  = indent ++ "LeafOk " ++ show x
+showTree indent (Tree x subtrees) = 
+  indent ++ "Tree " ++ show x ++ "\n" ++ 
+  concatMap (\subtree -> showTree (indent ++ "    ") subtree ++ "\n") subtrees
+
 
 treeHasOk :: EvalTree a -> Bool
 treeHasOk (LeafOk _) = True
