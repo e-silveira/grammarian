@@ -42,7 +42,7 @@ recognizeProduction p s =
     (False, _) -> Nothing
 
 recognizeVariable :: Grammar -> Variable -> String -> [EvalTree (Variable, String)]
-recognizeVariable g v s 
+recognizeVariable g v s
   | null nextNodes = [LeafErr (v, s)]
   | otherwise = [Tree (v,s) $ concatMap (\case 
                         (Just var, s1) -> recognizeVariable g var s1
@@ -50,6 +50,21 @@ recognizeVariable g v s
                         (Nothing, _) -> pure $ LeafErr (v,s)) nextNodes]
   where nextNodes = mapMaybe (`recognizeProduction` s) filteredProds
         filteredProds = filter (\p -> from p == v) $ productions g
+
+-- recognizeVariableNoRec :: Grammar -> Variable -> String -> [(Variable, String)] -> [EvalTree (Variable, String)]
+-- recognizeVariableNoRec g v s visited
+--   | null nextNodes = [LeafErr (v, s)]
+--   | otherwise = [Tree (v,s) evaluatedChildTrees]
+--   where nextNodes = mapMaybe (`recognizeProduction` s) filteredProds
+--         filteredProds = filter (\p -> from p == v) $ productions g
+--         evaluatedChildTrees = 
+--           concatMap (\case
+--             (Just var, s1) -> 
+--               if (var, s1) `elem` visited 
+--                 then mempty
+--                 else recognizeVariableNoRec g var s1 (visited++[(var,s1)])
+--             (Nothing, "") -> pure $ LeafOk (v, mempty)
+--             (Nothing, _) -> pure $ LeafErr (v,s)) nextNodes
 
 run :: Grammar -> String -> IO () 
 run g s = do
